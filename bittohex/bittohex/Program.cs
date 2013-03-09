@@ -13,6 +13,7 @@ namespace bittohex
         {
             string input = "";
             string output = "";
+            //if run through command we have var args to use
             if (args.Count<string>() == 2 && File.Exists(args[0]))
             {
                 input = args[0];
@@ -20,31 +21,65 @@ namespace bittohex
             }
             else
             {
-                Console.WriteLine("Enter inputfile");
-
+                //ask until file is found
                 while (!File.Exists(input))
                 {
+                    Console.WriteLine("Enter inputfile");
                     input = Console.ReadLine();
+                    if (!File.Exists(input))
+                    {
+                        Console.WriteLine("!File not found");
+                    }
                 }
+                //ask for output file
+                Console.WriteLine("File found");
                 Console.WriteLine("Enter output File");
                 output = Console.ReadLine();
             }
+            
+            //Prints the choosen files
             Console.WriteLine("Selected file:" + input);
             Console.WriteLine("Output file:" + output);
-            byte[] fileBytes = File.ReadAllBytes(args[0]);
-            StringBuilder sb = new StringBuilder();
-
-            foreach (byte b in fileBytes)
+            if (File.Exists(output))
             {
-                sb.Append("0x");
-                sb.Append(Convert.ToString(b, 16));
-                if (b != fileBytes.Last<byte>()) //dont append a space after last
+                Console.WriteLine("File: " + output + " already exists overwrite? yes/no");
+                string answer = Console.ReadLine();
+                if (answer.ToLower().Equals("no"))
                 {
-                    sb.Append(" ");//append a space
+                    Console.WriteLine("file not overwritten, press any key to exit");
+                    Console.Read();
+                    return;
                 }
             }
+            //try to read this file and convert it
+            try
+            {
+                //dirty read, but i works.. so hey..
+                byte[] fileBytes = File.ReadAllBytes(input);
+                StringBuilder sb = new StringBuilder();
 
-            File.WriteAllText(args[1], sb.ToString());
+                //loop through all the bytes and convert the to base16 or otherwise know as hex
+                foreach (byte b in fileBytes)
+                {
+                    sb.Append("0x");
+                    sb.Append(Convert.ToString(b, 16));
+                    if (b != fileBytes.Last<byte>()) //dont append a space after last
+                    {
+                        sb.Append(" ");//append a space so output is 0xbyte 0xbyte  not 0xbyte0xbyte
+                    }
+                }
+                //write all our data to file
+                File.WriteAllText(output, sb.ToString());
+                Console.WriteLine("Conversion complete, press any key to exit");
+                //this could be removed and simply having the application close on complete but i chose to do it this way so i can se what has been done
+                Console.Read();
+            }
+            catch (IOException ie)
+            {
+                Console.WriteLine("Error!! Something went wrong writing or reading to file\n"+ie.ToString());
+                Console.Read();
+            }
+
         }
     }
 }
