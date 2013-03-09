@@ -13,6 +13,7 @@ namespace bittohex
         {
             string input = "";
             string output = "";
+            string separator = ",";
             //if run through command we have var args to use
             if (args.Count<string>() == 2 && File.Exists(args[0]))
             {
@@ -36,20 +37,29 @@ namespace bittohex
                 Console.WriteLine("Enter output File");
                 output = Console.ReadLine();
             }
-            
+
+           
             //Prints the choosen files
             Console.WriteLine("Selected file:" + input);
             Console.WriteLine("Output file:" + output);
+            //checks if output exists asks for overwrite
             if (File.Exists(output))
             {
                 Console.WriteLine("File: " + output + " already exists overwrite? yes/no");
                 string answer = Console.ReadLine();
-                if (answer.ToLower().Equals("no"))
+                if (!answer.ToLower().Equals("yes"))
                 {
                     Console.WriteLine("file not overwritten, press any key to exit");
                     Console.Read();
                     return;
                 }
+            }
+            //asks for custom seperator
+            Console.WriteLine("Want custom seperator? press enter for default ','");
+            string customSeperator = Console.ReadLine();
+            if (customSeperator.Length != 0)
+            {
+                separator = customSeperator;
             }
             //try to read this file and convert it
             try
@@ -65,7 +75,7 @@ namespace bittohex
                     sb.Append(Convert.ToString(b, 16));
                     if (b != fileBytes.Last<byte>()) //dont append a space after last
                     {
-                        sb.Append(" ");//append a space so output is 0xbyte 0xbyte  not 0xbyte0xbyte
+                        sb.Append(separator);//append a space so output is 0xbyte 0xbyte  not 0xbyte0xbyte
                     }
                 }
                 //write all our data to file
