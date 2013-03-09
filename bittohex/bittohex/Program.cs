@@ -13,7 +13,7 @@ namespace bittohex
         {
             string input = "";
             string output = "";
-            string separator = ",";
+            string separator = ", ";
             //if run through command we have var args to use
             if (args.Count<string>() == 2 && File.Exists(args[0]))
             {
@@ -55,10 +55,11 @@ namespace bittohex
                 }
             }
             //asks for custom seperator
-            Console.WriteLine("Want custom seperator? press enter for default ','");
+            Console.WriteLine("Want custom seperator? press enter for default ', '");
             string customSeperator = Console.ReadLine();
             if (customSeperator.Length != 0)
             {
+                Console.WriteLine("custom seperator set");
                 separator = customSeperator;
             }
             //try to read this file and convert it
