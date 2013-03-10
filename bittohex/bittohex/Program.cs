@@ -72,12 +72,10 @@ namespace bittohex
                 //loop through all the bytes and convert the to base16 or otherwise know as hex
                 foreach (byte b in fileBytes)
                 {
+                    
                     sb.Append("0x");
-                    sb.Append(Convert.ToString(b, 16));
-                    if (b != fileBytes.Last<byte>()) //dont append a space after last
-                    {
-                        sb.Append(separator);//append a space so output is 0xbyte 0xbyte  not 0xbyte0xbyte
-                    }
+                    sb.Append(Convert.ToString(b, 16).PadLeft(2,'0'));
+                    sb.Append(separator);//append a space so output is 0xbyte 0xbyte  not 0xbyte0xbyte
                 }
                 //write all our data to file
                 File.WriteAllText(output, sb.ToString());
