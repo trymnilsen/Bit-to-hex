@@ -83,34 +83,26 @@ namespace bittohex
                 byte[] fileBytes = File.ReadAllBytes(input);
                 StringBuilder sb = new StringBuilder();
 
-                byte currentByte = 0;
-                byte byteNumberOfTimes = 1;
-                bool writeToStringBuilder = false;
+                byte byteToBeCompressed = 0;
+                int byteNumberOfTimes = 0;
                 //loop through all the bytes and convert the to base16 or otherwise know as hex
+                if (rleCompress)
+                    WriteLine(" -- > Starting rle compress");
+
                 foreach (byte b in fileBytes)
                 {
                     if (rleCompress)
                     {
-                        if (currentByte == b)
+                        if (byteToBeCompressed == b)
                         {
                             byteNumberOfTimes++;
                         }
-                        if (b != currentByte || byteNumberOfTimes > 254)
+                        else
                         {
-                            sb.Append("0x");
-                            sb.Append(Convert.ToString(byteNumberOfTimes, 16).PadLeft(2,'0'));
-                            sb.Append(separator);
-                            for(byte i=0; i<byteNumberOfTimes; i++)
-                            {
-                                sb.Append("0x");
-                                sb.Append(Convert.ToString(currentByte, 16).PadLeft(2, '0'));
-                                sb.Append(separator);
-                            }
-
-                            currentByte = b;
+                            sb.Append(GenerateRLE(byteToBeCompressed,byteNumberOfTimes));
                             byteNumberOfTimes = 1;
+                            byteToBeCompressed = b;
                         }
-
                     }
                     else
                     {
@@ -119,6 +111,8 @@ namespace bittohex
                         sb.Append(separator);//append a space so output is 0xbyte 0xbyte  not 0xbyte0xbyte
                     }
                 }
+                if (rleCompress)
+                    WriteLine(" -- > rle compress has ended");
                 //write all our data to file
                 bool fileNotWritten=true;
                 do
@@ -155,6 +149,28 @@ namespace bittohex
                 Console.Read();
             }
 
+        }
+        public static string GenerateRLE(byte byteToCompress, int byteNumberOfTimes)
+        {
+            StringBuilder sb = new StringBuilder();
+            ///number of bytes byte
+            ///
+
+            int numberOfWriteRepeat = byteNumberOfTimes / 255;
+            WriteLine(byteNumberOfTimes +"{0x" + Convert.ToString(byteNumberOfTimes, 16).PadLeft(2, '0') + "}" + " occurances of " + byteToCompress + "{0x" + Convert.ToString(byteToCompress, 16).PadLeft(2, '0') + "}" + " has been broken down to " + numberOfWriteRepeat + " repeats with " + byteNumberOfTimes % 255 + "in the last repition");
+            for (int i = 0; i <= numberOfWriteRepeat; i++)
+            {
+                byte numberOfBytes = (byte)(i * 255 <= byteNumberOfTimes ? 255 : byteNumberOfTimes % 255);
+                sb.Append("0x");
+                sb.Append(Convert.ToString(byteNumberOfTimes, 16).PadLeft(2, '0'));
+                sb.Append(separator);
+                //Actuall byte byte
+                sb.Append("0x");
+                sb.Append(Convert.ToString(byteToCompress, 16).PadLeft(2, '0'));
+                sb.Append(separator);
+            }
+
+            return sb.ToString();
         }
         public static bool PromtUser(string promtString)
         {
